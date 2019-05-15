@@ -9,6 +9,9 @@ import (
 	"os/signal"
 	"toggl_clone/User/userpb"
 
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -20,12 +23,46 @@ var collection *mongo.Collection
 
 type server struct{}
 
-//data model
 type UserItem struct {
 	ID       primitive.ObjectID `bson:"_id_omitempty"`
 	Name     string             `bson:"id_name"`
 	Email    string             `bson:"id_email"`
 	Password string             `bson:"id_password"`
+}
+
+func (*server) CreateUser(ctx context.Context, req *userpb.CreateUserRequest) (*userpb.CreateUserResponse, error) {
+	fmt.Println("A new user has been requested...")
+	user := req.GetUser() //parse data
+
+	data := UserItem{ //maps to proto UserItem
+		Name:     user.GetName(),
+		Email:    user.GetEmail(),
+		Password: user.GetPassword(),
+	}
+
+	res, err := collection.InsertOne(context.Background(), data) //send to mongo
+	if err != nil {
+		return nil, status.Errorf(
+			codes.Internal,
+			fmt.Sprintf("Internal Error: %v", err),
+		)
+	}
+	oid, ok := res.InsertedID.(primitive.ObjectID) //create object ID
+	if !ok {
+		return nil, status.Errorf(
+			codes.Internal,
+			fmt.Sprintf("Cannot convert to oid: %v", err),
+		)
+	}
+
+	return &userpb.CreateUserResponse{ //returns data with ID
+		User: &userpb.User{
+			Id:       oid.Hex(),
+			Name:     user.GetName(),
+			Email:    user.GetEmail(),
+			Password: user.GetPassword(),
+		},
+	}, nil
 }
 
 func main() {

@@ -11,6 +11,15 @@ message User {
 	string password = 4;
 }
 
+message CreateUserRequest {
+	User user = 1;
+}
+
+message CreateUserResponse{
+	User user = 1;        // will have id
+}
+
 service UserService {
+	rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
 
 }
