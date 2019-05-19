@@ -22,6 +22,7 @@ func main() {
 	c := userpb.NewUserServiceClient(cc)
 	fmt.Println("Creating User...")
 	user := &userpb.User{
+		Id:       "user1",
 		Name:     "Mjavala",
 		Email:    "mjavala@idaf.com",
 		Password: "LWJD*(&H&D@R@D#@#",
@@ -33,16 +34,3 @@ func main() {
 
 	fmt.Println("User has been created: %v", u)
 }
-
-//func doUnary(c sumpb.SumServiceClient) {
-//req := &sumpb.SumRequest{
-//Input: &sumpb.Input{
-//FirstNum:  41,
-///SecondNum: 1,
-//	},
-//}
-//res, err := c.Sum(context.Background(), req)
-//if err != nil {
-//	log.Fatalf("Error while calling Sum RPC: %v", err)
-//}
-//log.Fatalf("Response from Greet: %v", res.Result)}

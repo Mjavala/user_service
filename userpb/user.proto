@@ -21,5 +21,5 @@ message CreateUserResponse{
 
 service UserService {
 	rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
-
+	//rpc ReadUser(ReadUserRequest) returns (ReadUserResponse);  			//alo must return NOT FOUND
 }
